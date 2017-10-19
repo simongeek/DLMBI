@@ -1,0 +1,9 @@
+The goal of the project is to implement deep-learning-based algorithm that will predict and / or group targeted populations with a high prediction accuracy, and compare obtained results with existing approaches.
+
+Requirements:
+
+* The project should be implemented in Python programming language.
+* The implementation should include unit tests for all methods.
+* The source code should be placed in a repository on GitHub.
+* Algorithm should work correctly on data in the specified formats.
+* The project should include a build file.
