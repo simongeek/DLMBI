@@ -13,6 +13,10 @@ data = pd.read_csv('chromosom22.csv')
 
 ######### Data transformation #########
 
+# DataFrame transponse
+
+data = data.T
+
 # print length of DataFrame (SNP = 1103548)
 
 total_rows = data.count()
@@ -26,10 +30,13 @@ print(total_rows + 1)
 
 # drop unused rows: ALT_2, ALT_3
 
-df1 = data[data['ALT_2'].str.len() > 0]
-df2 = data[data['ALT_3'].str.len() > 0]
+#df1 = data[data['ALT_2'].str.len() > 0]
+#df2 = data[data['ALT_3'].str.len() > 0]
+
+print(data)
 
 
 
-print(df1)
+# PCA (ang. Principal Component Analysis) - Analiza głównych składowych
 
+#from sklearn.decomposition import PCA
