@@ -13,28 +13,24 @@ data = pd.read_csv('chromosom22.csv')
 
 ######### Data transformation #########
 
-# DataFrame transponse
+# Drop unused columns : QUAL, FILTER_PASS, ID
 
-data = data.T
+columns = ['QUAL', 'FILTER_PASS', 'ID']
+
+data.drop(columns, axis=1, inplace=True)
+
+# DataFrame transponse A( m x n)
+
+#data = data.T
+
+#out = data.to_csv('poTransponowaniu.csv', index=False)
 
 # print length of DataFrame (SNP = 1103548)
 
 total_rows = data.count()
 print(total_rows + 1)
 
-# drop unused columns: QUAL, FILTER_PASS, ID
-
-#columns = ['QUAL', 'FILTER_PASS', 'ID']
-
-#data.drop(columns, axis=1, inplace=True)
-
 # drop unused rows: ALT_2, ALT_3
-
-#df1 = data[data['ALT_2'].str.len() > 0]
-#df2 = data[data['ALT_3'].str.len() > 0]
-
-print(data)
-
 
 
 # PCA (ang. Principal Component Analysis) - Analiza głównych składowych
