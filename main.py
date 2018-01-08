@@ -11,28 +11,42 @@ import numpy as np
 
 data = pd.read_csv('chromosom22.csv')
 
+
 ######### Data transformation #########
 
-# Drop unused columns : QUAL, FILTER_PASS, ID
 
-columns = ['QUAL', 'FILTER_PASS', 'ID']
+# Drop unused rows
 
-data.drop(columns, axis=1, inplace=True)
+with open("chromosom22.csv") as input_file:
+    with open("output.csv", "w") as output_file:
+        for i, line in enumerate(input_file.readlines()):
+            if i == 0:
+                output_file.write(line)
+                continue
+            CHROM, POS, ID, REF, ALT_1, \
+            ALT_2, ALT_3, QUAL, FILTER_PASS = line.split(",")
+            if ALT_2 or ALT_2:
+                continue
+            output_file.write(line)
+
+outData = pd.read_csv('output.csv')
+
+# Drop unused columns : QUAL, FILTER_PASS, ID, ALT_2, ALT_3
+
+columns = ['QUAL', 'FILTER_PASS', 'ID', 'ALT_2', 'ALT_3']
+
+outData.drop(columns, axis=1, inplace=True)
 
 # DataFrame transponse A( m x n)
 
-#data = data.T
+outData = outData.T # we get A' (m x k)
 
-#out = data.to_csv('poTransponowaniu.csv', index=False)
+out = outData.to_csv('poTransponowaniu.csv', index=False)
 
-# print length of DataFrame (SNP = 1103548)
+# print length of DataFrame (SNP = 1097200) = ALT1 - ALT_2 - ALT_3
 
-total_rows = data.count()
-print(total_rows + 1)
+print(outData)
 
-# drop unused rows: ALT_2, ALT_3
-
-
-# PCA (ang. Principal Component Analysis) - Analiza głównych składowych
+# PCA - reduce matrix dimension
 
 #from sklearn.decomposition import PCA
