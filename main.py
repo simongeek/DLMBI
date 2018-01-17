@@ -6,17 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from nn import neural_network
 
-# Convert VCF to CSV file - DONE
-#allel.vcf_to_csv('chromosom22.vcf', 'chromosom22.csv')
-
 # Load our data as .csv file
 
-data = pd.read_csv('chromosom22.csv') # A (m x n)
+dataset = pd.read_csv('chr22qc_example.csv') # A" (m x n)
 
 
 ######### Data transformation #########
 
-
+"""
 # Drop unused rows
 
 with open("chromosom22.csv") as input_file:
@@ -28,7 +25,6 @@ with open("chromosom22.csv") as input_file:
             CHROM, POS, ID, REF, ALT_1, \
             ALT_2, ALT_3, QUAL, FILTER_PASS = line.split(",")
             if ALT_2 or ALT_2:
-                continue
             output_file.write(line)
 
 outData = pd.read_csv('output.csv')
@@ -48,8 +44,13 @@ print(outData)
 
 outData = outData.to_csv('afterDrop.csv', index=0)
 
+"""
 
+# print length of Data
 
-# PCA - reduce matrix dimension A" (m x r)
+print(dataset) # 2504 rows x 11159 columns
+
+# PCA
+
 
 #neural_network()
