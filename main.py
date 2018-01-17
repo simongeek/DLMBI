@@ -3,13 +3,15 @@
 import allel
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from nn import neural_network
 
 # Convert VCF to CSV file - DONE
 #allel.vcf_to_csv('chromosom22.vcf', 'chromosom22.csv')
 
 # Load our data as .csv file
 
-data = pd.read_csv('chromosom22.csv')
+data = pd.read_csv('chromosom22.csv') # A (m x n)
 
 
 ######### Data transformation #########
@@ -35,18 +37,19 @@ outData = pd.read_csv('output.csv')
 
 columns = ['QUAL', 'FILTER_PASS', 'ID', 'ALT_2', 'ALT_3']
 
-outData.drop(columns, axis=1, inplace=True)
+outData.drop(columns, axis=1, inplace=True) # now A'(m x k)
 
-# DataFrame transponse A( m x n)
-
-outData = outData.T # we get A' (m x k)
-
-out = outData.to_csv('poTransponowaniu.csv', index=False)
 
 # print length of DataFrame (SNP = 1097200) = ALT1 - ALT_2 - ALT_3
 
 print(outData)
 
-# PCA - reduce matrix dimension
+# Save Data into DataFrame .csv
 
-#from sklearn.decomposition import PCA
+outData = outData.to_csv('afterDrop.csv', index=0)
+
+
+
+# PCA - reduce matrix dimension A" (m x r)
+
+#neural_network()
