@@ -3,25 +3,14 @@ from sklearn.model_selection import train_test_split, cross_validate
 import numpy as np
 import itertools
 import collections
-
-'''
-ten dataset zostanie wczytany  naszych danych:
-w, h = 100, 200;
-dataset = [[0 for x in range(w)] for y in range(h)]
-
-out_dim = 27 # tyle jest roznych populacji
-
-'''
-
+import pandas as pd
 
 # Define the non-linear functions used
 def logistic(z):
     return 1 / (1 + np.exp(-z))
 
-
 def logistic_deriv(y):  # Derivative of logistic function
     return np.multiply(y, (1 - y))
-
 
 def softmax(z):
     return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
@@ -189,86 +178,55 @@ def update_params(layers, param_grads, learning_rate):
             param -= learning_rate * grad  # Update each parameter
 
 
-def neural_network():
-    # load the data from scikit-learn.
-    digits = datasets.load_digits()
+def neural_network(dataset, hidden_layers):
+    print("len(hidden_layers): %d"% len(hidden_layers))
+    if(len(hidden_layers) < 1):
+        print("Please provide at least one hidden layer dimention")
+        exit(1)
 
-    # Load the targets.
-    # Note that the targets are stored as digits, these need to be
-    #  converted to one-hot-encoding for the output sofmax layer.
-    T = np.zeros((digits.target.shape[0], 10))
-    T[np.arange(len(T)), digits.target] += 1
+    data = np.array(dataset.iloc[:, 3:-1])
+    target = dataset.iloc[:,-1]
+    labels = set(target)
+
+    #Convert target to output softmax layer format
+    T = pd.get_dummies(pd.Series(target))
 
     # Divide the data into a train and test set.
     X_train, X_test, T_train, T_test = train_test_split(
-        digits.data, T, test_size=0.4, random_state=42)
+        data, T, test_size=0.4, random_state=42)
     # Divide the test set into a validation set and final test set.
     X_validation, X_test, T_validation, T_test = train_test_split(
         X_test, T_test, test_size=0.5, random_state=42)
-    '''
 
-    #Prepare output target to softmax encoding
-    #TODO: zamienic populacje na numerki 1..27
-    T_tmp = np.asarray(dataset)[:,2]
-    T = np.zeros((T_tmp.shape[0],in_dim))
-    T[np.arange(len(T)), T_tmp] += 1
-
-
-    # Divide the data into a train and test set.
-    X_train, X_test, T_train, T_test = cross_validation.train_test_split(dataset, T, test_size=0.4)
-    # Divide the test set into a validation set and final test set.
-    X_validation, X_test, T_validation, T_test = cross_validation.train_test_split( X_test, T_test, test_size=0.5)
-    '''
-
+    print("in_dim: %d" % X_train.shape[1])
+    print("out_dim %d" % T_train.shape[1])
     # Define a sample model to be trained on the data
-    hidden_neurons_1 = 256  # Number of neurons in the first hidden-layer
-    hidden_neurons_2 = 128  # Number of neurons in the second hidden-layer
+    #hidden_neurons_1 = 256  # Number of neurons in the first hidden-layer
+    #hidden_neurons_2 = 128  # Number of neurons in the second hidden-layer
     # Create the model
     layers = []  # Define a list of layers
     # Add first hidden layer
+    hidden_neurons_1 = hidden_layers[0]
+    hidden_neurons_last = hidden_layers[-1]
+    print("hidden_neurons_1: %d"%hidden_neurons_1)
+    print("layer in")
+    print("neurons %d , %d" % (X_train.shape[1], hidden_neurons_1))
     layers.append(LinearLayer(X_train.shape[1], hidden_neurons_1))
     layers.append(LogisticLayer())
-    # Add second hidden layer
-    layers.append(LinearLayer(hidden_neurons_1, hidden_neurons_2))
-    layers.append(LogisticLayer())
+    # Add middle hidden layers
+    if (len(hidden_layers) > 1):
+        print("Create hidden layers")
+        for i in range(1, (len(hidden_layers))):
+            print("layer %d" % i)
+            print("hidden_neurons %d , %d" % (hidden_layers[i-1], hidden_layers[i]))
+            layers.append(LinearLayer(hidden_layers[i-1], hidden_layers[i]))
+            layers.append(LogisticLayer())
     # Add output layer
-    layers.append(LinearLayer(hidden_neurons_2, T_train.shape[1]))
+    print("layer last")
+    print("neurons %d , %d" % (hidden_neurons_last, T_train.shape[1]))
+    layers.append(LinearLayer(hidden_neurons_last, T_train.shape[1]))
     layers.append(SoftmaxOutputLayer())
-    '''
-    # Perform gradient checking
-    nb_samples_gradientcheck = 10  # Test the gradients on a subset of the data
-    X_temp = X_train[0:nb_samples_gradientcheck, :]
-    T_temp = T_train[0:nb_samples_gradientcheck, :]
-    # Get the parameter gradients with backpropagation
-    activations = forward_step(X_temp, layers)
-    param_grads = backward_step(activations, T_temp, layers)
 
-    # Set the small change to compute the numerical gradient
-    eps = 0.0001
-    # Compute the numerical gradients of the parameters in all layers.
-    for idx in range(len(layers)):
-        layer = layers[idx]
-        layer_backprop_grads = param_grads[idx]
-        # Compute the numerical gradient for each parameter in the layer
-        for p_idx, param in enumerate(layer.get_params_iter()):
-            grad_backprop = layer_backprop_grads[p_idx]
-            # + eps
-            param += eps
-            plus_cost = layers[-1].get_cost(forward_step(X_temp, layers)[-1], T_temp)
-            # - eps
-            param -= 2 * eps
-            min_cost = layers[-1].get_cost(forward_step(X_temp, layers)[-1], T_temp)
-            # reset param value
-            param += eps
-            # calculate numerical gradient
-            grad_num = (plus_cost - min_cost) / (2 * eps)
-            # Raise error if the numerical grade is not close to the backprop gradient
-            if not np.isclose(grad_num, grad_backprop):
-                raise ValueError(
-                    'Numerical gradient of {:.6f} is not close to the backpropagation gradient of {:.6f}!'.format(
-                        float(grad_num), float(grad_backprop)))
-    print('No gradient errors found')
-    '''
     # Create the minibatches
     batch_size = 32 # Approximately 25 samples per batch
     nb_of_batches = X_train.shape[0] / batch_size  # Number of batches
@@ -317,51 +275,3 @@ def neural_network():
     test_accuracy = metrics.accuracy_score(y_true, y_pred)  # Test set accuracy
     print('The accuracy on the test set is {:.2f}'.format(test_accuracy))
     return
-
-
-'''
-def sigmoid(x):
-  return 1 / (1 + math.exp(-x))
-
-# Function to compute the hidden activations
-def hidden_activations(x, wh):
-    return sigmoid(x * wh)
-
-# define the gradient function.
-def gradient(w, x, t):
-    return (nn(x, w) - t).T * x
-
-# Define output layer feedforward
-def output_activations(h , wo):
-    return logistic(h * wo - 1)
-
-# define the update function delta w which returns the
-#  delta w for each weight in a vector
-def delta_w(w_k, x, t, learning_rate):
-    return learning_rate * gradient(w_k, x, t)
-
-# Define the logistic function
-def logistic(z):
-    return 1 / (1 + np.exp(-z))
-
-# Define the neural network function y = 1 / (1 + numpy.exp(-x*w))
-# Define the neural network function
-def nn(x, wh, wo):
-    return output_activations(hidden_activations(x, wh), wo)
-# Define the neural network prediction function that only returns
-#  1 or 0 depending on the predicted class
-def nn_predict(x, wh, wo):
-    return np.around(nn(x, wh, wo))
-
-
-
-
-
-# Define the cost function
-def cost(y, t):
-    return - np.sum(np.multiply(t, np.log(y)) + np.multiply((1-t), np.log(1-y)))
-
-# Define a function to calculate the cost for a given set of parameters
-def cost_for_param(x, wh, wo, t):
-    return cost(nn(x, wh, wo) , t)
-'''
