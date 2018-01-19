@@ -189,7 +189,23 @@ def neural_network(dataset, hidden_layers):
     labels = set(target)
 
     #Convert target to output softmax layer format
-    T = pd.get_dummies(pd.Series(target))
+    T = np.array(pd.get_dummies(pd.Series(target)))
+
+    print("T:")
+    print(type(T))
+
+    digits = datasets.load_digits()
+    T2 = np.zeros((digits.target.shape[0], 10))
+    T2[np.arange(len(T2)), digits.target] += 1
+
+    print("T2:")
+    print(type(T2))
+
+    print("data:")
+    print(type(data))
+
+    print("digits.data:")
+    print(type(digits.data))
 
     # Divide the data into a train and test set.
     X_train, X_test, T_train, T_test = train_test_split(
@@ -200,10 +216,7 @@ def neural_network(dataset, hidden_layers):
 
     print("in_dim: %d" % X_train.shape[1])
     print("out_dim %d" % T_train.shape[1])
-    # Define a sample model to be trained on the data
-    #hidden_neurons_1 = 256  # Number of neurons in the first hidden-layer
-    #hidden_neurons_2 = 128  # Number of neurons in the second hidden-layer
-    # Create the model
+
     layers = []  # Define a list of layers
     # Add first hidden layer
     hidden_neurons_1 = hidden_layers[0]
@@ -263,6 +276,7 @@ def neural_network(dataset, hidden_layers):
         if len(validation_costs) > 3:
             # Stop training if the cost on the validation set doesn't decrease
             #  for 3 iterations
+            #if [(validation_costs[-1] >= validation_costs[-2]) & (validation_costs[-2] >= validation_costs[-3])]:
             if validation_costs[-1] >= validation_costs[-2] >= validation_costs[-3]:
                 break
 
