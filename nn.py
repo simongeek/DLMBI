@@ -16,11 +16,9 @@ def relu(z):
     return np.maximum(z, 0)
 
 def relu_deriv(y):
-    if (y>0):
-        return 1
-    else:
-        return 0.01
-
+    y[y <= 0] = 0.01
+    y[y > 0] = 1
+    return y
 
 def softmax(z):
     return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
@@ -208,7 +206,7 @@ def neural_network(dataset, hidden_layers):
     #params:
     batch_size = 32
     max_nb_of_iterations = 300  # Train for a maximum of 300 iterations
-    learning_rate = 0.1 #Gradient descent learning rate
+    learning_rate = 0.001 #Gradient descent learning rate
 
     data = np.array(dataset.iloc[:, 3:-1])
     target = dataset.iloc[:,-1]
