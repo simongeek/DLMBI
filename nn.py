@@ -12,6 +12,16 @@ def logistic(z):
 def logistic_deriv(y):  # Derivative of logistic function
     return np.multiply(y, (1 - y))
 
+def relu(z):
+    return np.maximum(z, 0)
+
+def relu_deriv(y):
+    if (y>0):
+        return 1
+    else:
+        return 0.01
+
+
 def softmax(z):
     return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
 
@@ -90,6 +100,17 @@ class LogisticLayer(Layer):
     def get_input_grad(self, Y, output_grad):
         """Return the gradient at the inputs of this layer."""
         return np.multiply(logistic_deriv(Y), output_grad)
+
+class ReluLayer(Layer):
+    """The logistic layer applies the logistic function to its inputs."""
+
+    def get_output(self, X):
+        """Perform the forward step transformation."""
+        return relu(X)
+
+    def get_input_grad(self, Y, output_grad):
+        """Return the gradient at the inputs of this layer."""
+        return np.multiply(relu_deriv(Y), output_grad)
 
 
 class SoftmaxOutputLayer(Layer):
@@ -184,6 +205,11 @@ def neural_network(dataset, hidden_layers):
         print("Please provide at least one hidden layer dimention")
         exit(1)
 
+    #params:
+    batch_size = 32
+    max_nb_of_iterations = 300  # Train for a maximum of 300 iterations
+    learning_rate = 0.1 #Gradient descent learning rate
+
     data = np.array(dataset.iloc[:, 3:-1])
     target = dataset.iloc[:,-1]
     labels = set(target)
@@ -225,7 +251,7 @@ def neural_network(dataset, hidden_layers):
     print("layer in")
     print("neurons %d , %d" % (X_train.shape[1], hidden_neurons_1))
     layers.append(LinearLayer(X_train.shape[1], hidden_neurons_1))
-    layers.append(LogisticLayer())
+    layers.append(ReluLayer())
     # Add middle hidden layers
     if (len(hidden_layers) > 1):
         print("Create hidden layers")
@@ -233,7 +259,7 @@ def neural_network(dataset, hidden_layers):
             print("layer %d" % i)
             print("hidden_neurons %d , %d" % (hidden_layers[i-1], hidden_layers[i]))
             layers.append(LinearLayer(hidden_layers[i-1], hidden_layers[i]))
-            layers.append(LogisticLayer())
+            layers.append(ReluLayer())
     # Add output layer
     print("layer last")
     print("neurons %d , %d" % (hidden_neurons_last, T_train.shape[1]))
@@ -241,7 +267,7 @@ def neural_network(dataset, hidden_layers):
     layers.append(SoftmaxOutputLayer())
 
     # Create the minibatches
-    batch_size = 32 # Approximately 25 samples per batch
+
     nb_of_batches = X_train.shape[0] / batch_size  # Number of batches
     # Create batches (X,Y) from the training set
     XT_batches = zip(
@@ -254,8 +280,7 @@ def neural_network(dataset, hidden_layers):
     training_costs = []
     validation_costs = []
 
-    max_nb_of_iterations = 300  # Train for a maximum of 300 iterations
-    learning_rate = 0.1 #Gradient descent learning rate
+
 
     # Train for the maximum number of iterations
     for iteration in range(max_nb_of_iterations):
