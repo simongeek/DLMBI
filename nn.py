@@ -205,8 +205,8 @@ def neural_network(dataset, hidden_layers):
 
     #params:
     batch_size = 32
-    max_nb_of_iterations = 300  # Train for a maximum of 300 iterations
-    learning_rate = 0.001 #Gradient descent learning rate
+    max_nb_of_iterations = 1000  # Train for a maximum of 300 iterations
+    learning_rate = 0.5 #Gradient descent learning rate
 
     data = np.array(dataset.iloc[:, 3:-1])
     target = dataset.iloc[:,-1]
@@ -304,11 +304,23 @@ def neural_network(dataset, hidden_layers):
                 break
 
     nb_of_iterations = iteration + 1  # The number of iterations that have been executed
-
+    print("Finished at iteration: %d" % nb_of_iterations)
     # Get results of test data
     y_true = np.argmax(T_test, axis=1)  # Get the target outputs
     activations = forward_step(X_test, layers)  # Get activation of test samples
     y_pred = np.argmax(activations[-1], axis=1)  # Get the predictions made by the network
     test_accuracy = metrics.accuracy_score(y_true, y_pred)  # Test set accuracy
     print('The accuracy on the test set is {:.2f}'.format(test_accuracy))
+
+    import matplotlib.pyplot as plt
+    plt.figure(1)
+    plt.subplot(211)
+    plt.plot(validation_costs)
+    plt.label('validation_costs')
+
+    plt.subplot(212)
+    plt.plot(training_costs)
+    plt.label('training_costs')
+    plt.show()
+
     return
