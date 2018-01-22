@@ -80,7 +80,7 @@ class SoftmaxOutputLayer(Layer):
         return (Y - T) / Y.shape[0]
 
     def get_cost(self, Y, T):
-        return - np.multiply(T, np.log(Y)).sum() / Y.shape[0]
+        return - np.float64(np.multiply(T, np.log(Y)).sum()) / Y.shape[0]
 
 
 # Forward propagation, returns activations for each layer
@@ -145,11 +145,12 @@ def neural_network(dataset, hidden_layers):
         exit(1)
 
     #params:
-    batch_size = 16
-    max_nb_of_iterations = 5
+    batch_size =32
+    max_nb_of_iterations = 2
     learning_rate = 0.1
 
-    data = np.array(dataset.iloc[:, 3:-1])
+    #data = np.array(dataset.iloc[:, 3:-1])
+    data = np.array(dataset.iloc[:, 3:200])
     target = dataset.iloc[:,-1]
     del dataset
 
@@ -228,7 +229,7 @@ def neural_network(dataset, hidden_layers):
         # Get full validation cost
         activations = forward_step(X_validation, layers)
         validation_cost = layers[-1].get_cost(activations[-1], T_validation)
-        validation_costs.append(validation_cost)
+        validation_costs.append((validation_cost))
         del validation_cost
 
         if len(validation_costs) > 3:
