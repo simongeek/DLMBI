@@ -14,8 +14,9 @@ def relu_deriv(y):
     y[y > 0] = 1
     return y
 
-def softmax(z):
-    return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
+from sklearn.utils.extmath import softmax
+#def softmax(z):
+    #return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
 
 #Base layer class
 class Layer(object):
@@ -145,7 +146,7 @@ def neural_network(dataset, hidden_layers):
 
     #params:
     batch_size = 16
-    max_nb_of_iterations = 100
+    max_nb_of_iterations = 5
     learning_rate = 0.1
 
     data = np.array(dataset.iloc[:, 3:-1])
@@ -193,10 +194,13 @@ def neural_network(dataset, hidden_layers):
 
     # Create the minibatches
     nb_of_batches = X_train.shape[0] / batch_size
+    X_batch = np.array_split(X_train, nb_of_batches, axis=0)
+    Y_batch = np.array_split(T_train, nb_of_batches, axis=0)
+    '''
     XT_batches = zip(
         np.array_split(X_train, nb_of_batches, axis=0),
         np.array_split(T_train, nb_of_batches, axis=0))
-
+    '''
     # Perform backpropagation
     #minibatch_costs = []
     training_costs = []
@@ -206,6 +210,7 @@ def neural_network(dataset, hidden_layers):
     for iteration in range(max_nb_of_iterations):
         print("Iteration: %d~~~~~~~~~~~~~~~~~~~~~~" % iteration)
         batch_nr = 0
+        XT_batches = zip(X_batch, Y_batch)
         for X, T in XT_batches:  # For each minibatch sub-iteration
             batch_nr = batch_nr + 1
             print("Batch nr:%d from %d" % (batch_nr, nb_of_batches))
@@ -249,6 +254,8 @@ def neural_network(dataset, hidden_layers):
     '''
     evaluate(y_true, y_pred)
 
+    print("validation_costs: ")
+    print(validation_costs)
 
     import matplotlib.pyplot as plt
     plt.figure(1)
