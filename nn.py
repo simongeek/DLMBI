@@ -4,7 +4,9 @@ import numpy as np
 import itertools
 import collections
 import pandas as pd
-from sklearn.metrics import f1_score, precision_score, recall_score
+import matplotlib as plt
+import matplotlib.pyplot as plot
+from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix, accuracy_score
 
 def relu(z):
     return np.maximum(z, 0)
@@ -125,18 +127,74 @@ def update_params(layers, param_grads, learning_rate):
 
 #Evaluate network results
 def evaluate(test_labels, predictions):
-    precision = precision_score(test_labels, predictions, average='micro')
-    recall = recall_score(test_labels, predictions, average='micro')
-    f1 = f1_score(test_labels, predictions, average='micro')
-    print("Micro-average quality numbers")
-    print("Precision: {:.4f}, Recall: {:.4f}, F1-measure: {:.4f}".format(precision, recall, f1))
+    precision = precision_score(test_labels, predictions, average='binary')
+    recall = recall_score(test_labels, predictions, average='binary')
+    f1 = f1_score(test_labels, predictions, average='binary')
+    cm = confusion_matrix(test_labels, predictions)
+    tn, fp, fn, tp = cm.ravel()
+    sensitivity = tp / (tp + fn)
+    specifity = tn / (tn + fp)
+    acc = accuracy_score(test_labels, predictions)
+    class_names = set(test_labels)
+    print("Quality numbers")
+    print("Precision: {:.4f}, Recall: {:.4f}, F1-measure: {:.4f}, Sensitivity: {:.4f}, Specifity {:.4f}, Accuracy: {:.4f},"
+          .format(precision, recall, f1, sensitivity, specifity, acc))
+    plt.figure()
+    plot_confusion_matrix(cm, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
 
-    precision = precision_score(test_labels, predictions, average='macro')
-    recall = recall_score(test_labels, predictions, average='macro')
-    f1 = f1_score(test_labels, predictions, average='macro')
-    print("Macro-average quality numbers")
-    print("Precision: {:.4f}, Recall: {:.4f}, F1-measure: {:.4f}".format(precision, recall, f1))
+    plt.show()
 
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plot.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def confusion_matrix(Y_pred, T_test):
+    from sklearn.metrics import confusion_matrix
+    #Y_pred = cnn_n.predict(x_test, verbose=2)
+    y_pred = np.argmax(Y_pred, axis=1)
+
+    for ix in range(10):
+        print(ix, confusion_matrix(np.argmax(T_test, axis=1), y_pred)[ix].sum())
+    cm = confusion_matrix(np.argmax(T_test, axis=1), y_pred)
+    print(cm)
+    class_names = set(T_test)
+    # Plot normalized confusion matrix
+    plt.figure()
+    plot_confusion_matrix(cm, classes=class_names, normalize=True,
+                          title='Normalized confusion matrix')
+
+    plt.show()
 
 def neural_network(dataset, hidden_layers):
     print("len(hidden_layers): %d"% len(hidden_layers))
@@ -145,12 +203,12 @@ def neural_network(dataset, hidden_layers):
         exit(1)
 
     #params:
-    batch_size =32
-    max_nb_of_iterations = 2
-    learning_rate = 0.1
+    batch_size =128
+    max_nb_of_iterations = 300
+    learning_rate = 0.01
 
     #data = np.array(dataset.iloc[:, 3:-1])
-    data = np.array(dataset.iloc[:, 3:200])
+    data = np.array(dataset.iloc[:, 3:400])
     target = dataset.iloc[:,-1]
     del dataset
 
@@ -258,7 +316,6 @@ def neural_network(dataset, hidden_layers):
     print("validation_costs: ")
     print(validation_costs)
 
-    import matplotlib.pyplot as plt
     plt.figure(1)
     plt.subplot(211)
     plt.plot(validation_costs)
