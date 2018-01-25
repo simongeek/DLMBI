@@ -22,9 +22,9 @@ uzyskane rezultaty z istniejącymi.
 ## 3. Uruchomienie programu
 
 1. Otwieramy plik nn.py i definiujemy parametry sieci, które chcemy przetestować np.
-batch_size = 128
-max_nb_of_iterations = 200
-learning_rate = 0.001
+* batch_size = 128
+* max_nb_of_iterations = 200
+* learning_rate = 0.001
 
 2. Definiujemy ilość wybranych cech do przetestowania naszego zbioru danych 
 Zmienna data odpowiada za ilość wczytywanych do sieci cech np. 
