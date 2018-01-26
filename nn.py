@@ -213,24 +213,19 @@ def neural_network(dataset, hidden_layers):
     #data = np.array(dataset.iloc[:, 3:-1])
     idx = np.random.randint(2, len(dataset), size=3000)
     data = np.array(dataset.iloc[:, idx])
-    print(type(data))
-    print(len(data))
-    print(len(data[0]))
-    #data = np.array(dataset.iloc[:, 3:100])
     target = dataset.iloc[:,-1]
-    print(target)
     del dataset
 
     target_labels = np.unique(target)
-    print(target_labels)
+
     #Convert target to output softmax layer format
     T = np.array(pd.get_dummies(pd.Series(target)))
     del target
-    print(T)
+
     # Divide the data into a train and test set.
     X_train, X_test, T_train, T_test = train_test_split(
         data, T, test_size=0.4, random_state=42)
-    del data
+    del data, T
     # Divide the test set into a validation set and final test set.
     X_validation, X_test, T_validation, T_test = train_test_split(
         X_test, T_test, test_size=0.5, random_state=42)
@@ -266,11 +261,7 @@ def neural_network(dataset, hidden_layers):
     nb_of_batches = X_train.shape[0] / batch_size
     X_batch = np.array_split(X_train, nb_of_batches, axis=0)
     Y_batch = np.array_split(T_train, nb_of_batches, axis=0)
-    '''
-    XT_batches = zip(
-        np.array_split(X_train, nb_of_batches, axis=0),
-        np.array_split(T_train, nb_of_batches, axis=0))
-    '''
+
     # Perform backpropagation
     #minibatch_costs = []
     training_costs = []
@@ -314,30 +305,10 @@ def neural_network(dataset, hidden_layers):
     y_true = np.argmax(T_test, axis=1)  # Get the target outputs
     activations = forward_step(X_test, layers)  # Get activation of test samples
     y_pred = np.argmax(activations[-1], axis=1)  # Get the predictions made by the network
-    '''
-    test_accuracy = metrics.accuracy_score(y_true, y_pred)  # Test set accuracy
-    test_f1 = metrics.f1_score(y_true, y_pred)
-    test_recall = metrics.recall_score(y_true, y_pred)
-    print('The accuracy on the test set is {:.2f}'.format(test_accuracy))
-    print('The f1 on the test set is {:.2f}'.format(test_f1))
-    print('The recall on the test set is {:.2f}'.format(test_recall))
-    '''
+
     evaluate(y_true, y_pred, target_labels)
     print(len(y_true))
     print(y_pred)
     print(y_true)
 
-    #print("validation_costs: ")
-    #print(validation_costs)
-    '''
-    plt.figure(1)
-    plt.subplot(211)
-    plt.plot(validation_costs)
-    plt.ylabel('validation_costs')
-
-    plt.subplot(212)
-    plt.plot(training_costs)
-    plt.ylabel('training_costs')
-    plt.show()
-    '''
     return
