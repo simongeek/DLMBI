@@ -206,20 +206,27 @@ def neural_network(dataset, hidden_layers):
         exit(1)
 
     #params:
-    batch_size =128
-    max_nb_of_iterations = 10
+    batch_size =64
+    max_nb_of_iterations = 50
     learning_rate = 0.01
 
     #data = np.array(dataset.iloc[:, 3:-1])
-    data = np.array(dataset.iloc[:, 3:100])
+    idx = np.random.randint(2, len(dataset), size=3000)
+    data = np.array(dataset.iloc[:, idx])
+    print(type(data))
+    print(len(data))
+    print(len(data[0]))
+    #data = np.array(dataset.iloc[:, 3:100])
     target = dataset.iloc[:,-1]
+    print(target)
     del dataset
 
     target_labels = np.unique(target)
+    print(target_labels)
     #Convert target to output softmax layer format
     T = np.array(pd.get_dummies(pd.Series(target)))
     del target
-
+    print(T)
     # Divide the data into a train and test set.
     X_train, X_test, T_train, T_test = train_test_split(
         data, T, test_size=0.4, random_state=42)
@@ -316,6 +323,9 @@ def neural_network(dataset, hidden_layers):
     print('The recall on the test set is {:.2f}'.format(test_recall))
     '''
     evaluate(y_true, y_pred, target_labels)
+    print(len(y_true))
+    print(y_pred)
+    print(y_true)
 
     #print("validation_costs: ")
     #print(validation_costs)
