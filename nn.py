@@ -6,84 +6,10 @@ import collections
 import pandas as pd
 import matplotlib as plt
 import matplotlib.pyplot as plot
-from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix, accuracy_score, classification_report, roc_curve
-
-def relu(z):
-    return np.maximum(z, 0)
-
-def relu_deriv(y):
-    y[y <= 0] = 0.01
-    y[y > 0] = 1
-    return y
-
-from sklearn.utils.extmath import softmax
-#def softmax(z):
-    #return np.exp(z) / np.sum(np.exp(z), axis=1, keepdims=True)
-
-#Base layer class
-class Layer(object):
-
-    #Return iterator over parameters
-    def get_params_iter(self):
-        return []
-
-    #Return gradient of parameters
-    def get_params_grad(self, X, output_grad):
-        return []
-
-    def get_output(self, X):
-        pass
-
-    #Return gradient at inputs of layer
-    def get_input_grad(self, Y, output_grad=None, T=None):
-
-        pass
-
-#Linear transformation
-class LinearLayer(Layer):
-
-    def __init__(self, n_in, n_out):
-        self.W = np.random.randn(n_in, n_out) * 0.1
-        self.b = np.zeros(n_out)
-
-    def get_params_iter(self):
-        return itertools.chain(np.nditer(self.W, op_flags=['readwrite']),
-                               np.nditer(self.b, op_flags=['readwrite']))
-
-    def get_output(self, X):
-        return X.dot(self.W) + self.b
-
-    def get_params_grad(self, X, output_grad):
-        JW = X.T.dot(output_grad)
-        Jb = np.sum(output_grad, axis=0)
-        del output_grad, X
-        return [g for g in itertools.chain(np.nditer(JW), np.nditer(Jb))]
-
-    def get_input_grad(self, Y, output_grad):
-        return output_grad.dot(self.W.T)
-
-#Apply ReLu function
-class ReluLayer(Layer):
-
-    def get_output(self, X):
-        return relu(X)
-
-    def get_input_grad(self, Y, output_grad):
-        return np.multiply(relu_deriv(Y), output_grad)
-
-#Apply softMax function
-class SoftmaxOutputLayer(Layer):
-
-
-    def get_output(self, X):
-        return softmax(X)
-
-    def get_input_grad(self, Y, T):
-        return (Y - T) / Y.shape[0]
-
-    def get_cost(self, Y, T):
-        return - np.float64(np.multiply(T, np.log(Y)).sum()) / Y.shape[0]
-
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+from LinearLayer import LinearLayer
+from ReluLayer import ReluLayer
+from SoftmaxLayer import SoftmaxOutputLayer
 
 # Forward propagation, returns activations for each layer
 def forward_step(input_samples, layers):
@@ -117,7 +43,6 @@ def backward_step(activations, targets, layers):
         del grads
         output_grad = input_grad
     return list(param_grads)
-
 
 #Update parameters according to given gradient
 def update_params(layers, param_grads, learning_rate):
@@ -207,12 +132,12 @@ def neural_network(dataset, hidden_layers):
 
     #params:
     batch_size =64
-    max_nb_of_iterations = 50
+    max_nb_of_iterations = 300
     learning_rate = 0.01
 
     #data = np.array(dataset.iloc[:, 3:-1])
-    idx = np.random.randint(2, len(dataset), size=3000)
-    data = np.array(dataset.iloc[:, idx])
+    #idx = np.random.randint(2, len(dataset), size=3000)
+    data = np.array(dataset.iloc[:, 3:1000])
     target = dataset.iloc[:,-1]
     del dataset
 

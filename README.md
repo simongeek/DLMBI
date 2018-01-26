@@ -34,4 +34,6 @@ data = np.array(dataset.iloc[:, 3:200]) oznacza wczytanie danych z 200 pierwszym
 
 4. Czekamy na rezultat
 
+### 4. Uruchomienie unit testów
+Uruchamiamy plik TestRunner.py, który uruchamia wszystkie unit testy
 
