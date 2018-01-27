@@ -1,4 +1,6 @@
 import unittest
+from numpy.testing import assert_array_equal
+import numpy as np
 from ReluLayer import ReluLayer, relu_deriv, relu
 
 class ReluLayerTestCase(unittest.TestCase):
@@ -6,17 +8,17 @@ class ReluLayerTestCase(unittest.TestCase):
         self.reluLayer = ReluLayer()
 
     def tearDown(self):
-        self.reluLayer.dispose()
+        del self.reluLayer
 
     def test_get_output(self):
-        self.assertEqual(self.reluLayer.get_output([-1,1]), [[0,1]])
+        assert_array_equal(self.reluLayer.get_output(np.array([-1,1])), np.array([0,1]))
 
     def test_get_input_grad(self):
-        self.assertEqual(self.reluLayer.get_input_grad([-1,1],[0.5, 0.5]), [0.005, 0.5])
+        assert_array_equal(self.reluLayer.get_input_grad(np.array([-1,1]),np.array([0.5, 0.5])), np.array([0, 0.5]))
 
     def test_relu(self):
         self.assertEqual(relu(-1), 0)
         self.assertEqual(relu(1), 1)
 
     def test_relu_deriv(self):
-        self.assertEqual(relu_deriv([-1,1]), [0.01, 1])
+        assert_array_equal(relu_deriv(np.array([-1,1])), np.array([0, 1]))

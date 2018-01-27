@@ -1,7 +1,7 @@
 import unittest
 from TestLinearLayer import LinearLayerTestCase
 from TestReluLayer import ReluLayerTestCase
-from TestSoftmaxLayer import SoftmaxOutputLayer
+from TestSoftmaxLayer import SoftmaxLayerTestCase
 
 def suite():
     suite = unittest.TestSuite()
@@ -15,9 +15,9 @@ def suite():
     suite.addTest(ReluLayerTestCase('test_relu'))
     suite.addTest(ReluLayerTestCase('test_relu_deriv'))
 
-    suite.addTest(SoftmaxOutputLayer('test_get_output'))
-    suite.addTest(SoftmaxOutputLayer('test_get_input_grad'))
-    suite.addTest(SoftmaxOutputLayer('test_get_cost'))
+    suite.addTest(SoftmaxLayerTestCase('test_get_output'))
+    suite.addTest(SoftmaxLayerTestCase('test_get_input_grad'))
+    suite.addTest(SoftmaxLayerTestCase('test_get_cost'))
 
     return suite
 

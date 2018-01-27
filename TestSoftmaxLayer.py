@@ -1,18 +1,20 @@
 import unittest
+from numpy.testing import assert_array_equal
+import numpy as np
 from SoftmaxLayer import SoftmaxOutputLayer
 
-class ReluLayerTestCase(unittest.TestCase):
+class SoftmaxLayerTestCase(unittest.TestCase):
     def setUp(self):
         self.softmaxLayer = SoftmaxOutputLayer()
 
     def tearDown(self):
-        self.softmaxLayer.dispose()
+        del self.softmaxLayer
 
     def test_get_output(self):
-        self.assertEqual(self.softmaxLayer.get_output(0), 1)
+        assert_array_equal(self.softmaxLayer.get_output(np.array(0.0).reshape((1,1))), np.array(1.0).reshape((1,1)))
 
     def test_get_input_grad(self):
-        self.assertEqual(self.softmaxLayer.get_input_grad([-1,1],[0.5, 0.5]), [-1.5, 0.5])
+        assert_array_equal(self.softmaxLayer.get_input_grad(np.array([-1,1]),np.array([0.5, 0.5])), np.array([-0.75, 0.25]))
 
     def test_get_cost(self):
-        self.assertEqual(self.softmaxLayer.get_cost([1,1],[0.5, 0.5]), 0)
+        assert_array_equal(self.softmaxLayer.get_cost(np.array([1,1]),np.array([0.5, 0.5])), 0)
