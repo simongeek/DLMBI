@@ -26,8 +26,7 @@ uzyskane rezultaty z istniejącymi.
 * max_nb_of_iterations = 200
 * learning_rate = 0.001
 
-2. Definiujemy ilość wybranych cech do przetestowania naszego zbioru danych 
-          Zmienna data odpowiada za ilość wczytywanych do sieci cech np. 
+2. Definiujemy ilość wybranych cech do przetestowania naszego zbioru danych. Zmienna data odpowiada za ilość wczytywanych do sieci cech np. 
 data = np.array(dataset.iloc[:, 3:200]) oznacza wczytanie danych z 200 pierwszymi cechami do naszej sieci
 
 3. Uruchamiamy plik main.py z dowolną liczbą parametrów typu całkowitoliczbowych oddzielonych spacjami, oznaczających ilość neurnów kolejnych warstw ukrytych
